@@ -12,17 +12,18 @@ server_url = "http://192.168.0.100"  # Замініть це на реальни
 
 async def test_compute_endpoint():
     user_id = 1
-    method = "SLAEbyIterations"
+
     input_data = [[1, 2, 3, 4]]
     async with httpx.AsyncClient() as client:
         response = await client.post(
-            f"{server_url}/compute",
-            json={"user_id": user_id, "method": method, "input_data": input_data},
+            f"{server_url}/createTask",
+            json={"user_id": user_id, "input_data": input_data},
         )
         response_data = response.json()
         print("task created", response_data)
         return
         await sleep(30)
+        task_id = response_data["task_id"]
         print("canceling", task_id)
         response = await client.post(
             f"{server_url}/cancel_task",

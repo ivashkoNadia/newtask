@@ -5,6 +5,7 @@ from json import dumps
 import db
 from . import utils
 from . import core
+#python runnode.py --proxy 192.168.0.100
 
 
 class ProxyFastAPI(FastAPI):
@@ -65,12 +66,11 @@ async def check_status():
     pass
 
 
-@app.post("/create_task")
+@app.post("/createTask")
 async def compute(request: Request):
     session = db.Session()
     json_data = await request.json()
     user_id = json_data["user_id"]
-    method = json_data["method"]
     input_data = json_data["input_data"]
     if request.client.host not in (app.proxy, "127.0.0.1"):
         return HTTPException(403, "Access denied")
@@ -78,17 +78,16 @@ async def compute(request: Request):
     user = session.query(db.models.User).filter_by(id=user_id).first()
     if not user:
         return HTTPException(404, "User not found")
-    if not utils.validate_method(method):
-        return HTTPException(404, f"Invalid method")
-    if not utils.validate_input_data(method, input_data):
-        return HTTPException(404, f"Invalid input_data for {method}")
+
+    if not utils.validate_input_data(input_data):
+        return HTTPException(404, f"Invalid input_data ")
     task = db.models.Task(
         user_id=user_id,
         node_id=node.id,
-        method=method,
         input_data=dumps(input_data)
     )
     session.add(task)
+    print("in compute app")
     session.commit()
     new_task = create_task(core.compute(task.id))
     aio_tasks[task.id] = new_task

@@ -1,7 +1,7 @@
 import socket
 
 
-def validate_input_data(method: str, input_data: list | dict) -> bool:
+def validate_input_data(input_data) :
     return True
 
 
