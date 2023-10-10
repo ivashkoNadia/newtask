@@ -1,6 +1,8 @@
 from asyncio import sleep, CancelledError
 from json import dumps
 import db
+import random
+import time
 from . import exceptions
 
 
@@ -27,9 +29,38 @@ async def compute(task_id: int):
     session.commit()
 
 
-async def SLAEbyIterations(input_data: list[list[float]]) -> list[float]:
-    await sleep(20)
-    print("before exeotion")
-    raise exceptions.ExceptionError()
-    print("after exeption")
-    return input_data[0]
+async def SLAEbyIterations(input_data: int):
+    if input_data<=2:
+        exceptions.ExceptionError("not valid size")
+    matrix, right_column = fillRandomSLAR(input_data)
+    result1, time1 = poslidovnuy(matrix, right_column)
+    return  time1,  result1
+
+
+
+def fillRandomSLAR(size):
+    matrix = [[random.randint(1, 20) for _ in range(size)] for _ in range(size)]
+    right_column = [random.randint(1, 20) for _ in range(size)]
+    return matrix, right_column
+
+def poslidovnuy(matrix, right_column):
+    N = len(matrix)
+    result = [0] * N
+    start_time = time.time()
+
+    for i in range(N):
+        for j in range(i + 1, N):
+            mnj = matrix[j][i] / matrix[i][i]
+            for k in range(i, N):
+                matrix[j][k] -= mnj * matrix[i][k]
+            right_column[j] -= mnj * right_column[i]
+
+    for i in range(N - 1, -1, -1):
+        result[i] = right_column[i]
+        for j in range(i + 1, N):
+            result[i] -= matrix[i][j] * result[j]
+        result[i] /= matrix[i][i]
+
+    end_time = time.time()
+    return result, (end_time - start_time) * 1000
+
