@@ -9,8 +9,11 @@ from . import exceptions
 async def compute(task_id: int):
     session = db.Session()
     task = session.query(db.models.Task).filter_by(id=task_id).first()
+    input_data = task.get_input_data()
+    size_value = input_data["size"]
     try:
-        output_data = await SLAEbyIterations(task.get_input_data())
+        output_data = await SLAEbyIterations(size_value)
+        print("after slay")
     except CancelledError:
         print("CancelledError")
         return
@@ -34,7 +37,7 @@ async def SLAEbyIterations(input_data: int):
         exceptions.ExceptionError("not valid size")
     matrix, right_column = fillRandomSLAR(input_data)
     result1, time1 = poslidovnuy(matrix, right_column)
-    return  time1,  result1
+    return result1
 
 
 
@@ -62,5 +65,6 @@ def poslidovnuy(matrix, right_column):
         result[i] /= matrix[i][i]
 
     end_time = time.time()
+    print(result)
     return result, (end_time - start_time) * 1000
 

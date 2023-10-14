@@ -13,7 +13,7 @@ server_url = "http://192.168.0.100"  # Замініть це на реальни
 async def test_compute_endpoint():
     user_id = 1
 
-    input_data = [[1, 2, 3, 4]]
+    input_data = {"size":10} #кількість невідомих
     async with httpx.AsyncClient() as client:
         response = await client.post(
             f"{server_url}/createTask",
