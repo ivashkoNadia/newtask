@@ -47,14 +47,40 @@ async def signin(request: Request):
     session.close()
     return {"message": "User signed in successfully"}
 
+@app.post("/createTask")
+async def compute(request: Request):
+    session = db.Session()
+    json_data = await request.json()
+    email = json_data["email"]
+    password = json_data["password"]
+    input_data = json_data["input_data"]
+
+    user = session.query(db.models.User).filter_by(email=email).first()
+    if not user or user.password != password:
+        session.close()
+        return HTTPException(401, "Invalid email or password")
+    try:
+        number = int(input_data)
+    except ValueError:
+        return HTTPException(401, "Це не число")
+    if number <= 0:
+        return HTTPException(401, "Це не додатнє число")
 
 
 @app.get("/user_tasks/{user_id}")
-async def get_user_tasks(user_id: int):
+async def get_user_tasks(request: Request):
     session = db.Session()
+    json_data = await request.json()
+    email = json_data["email"]
+    password = json_data["password"]
+    #щоб не можна було витягнути інформацію про чужі tasks
+    user = session.query(db.models.User).filter_by(email=email).first()
+    if not user or user.password != password:
+        session.close()
+        return HTTPException(401, "Invalid email or password")
 
     # Пошук усіх завдань для користувача з вказаним user_id
-    tasks = session.query(Task).filter_by(user_id=user_id).all()
+    tasks = session.query(Task).filter_by(user_id=user.id).all()
     session.close()
 
     if not tasks:

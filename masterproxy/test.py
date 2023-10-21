@@ -3,9 +3,9 @@
 import httpx
 
 async def test_registration():
-    url = "http://192.168.0.100:8080/registration"  # Замініть це на фактичну URL вашого API
+    url = "http://0.0.0.0:8080/registration"  # Замініть це на фактичну URL вашого API
     json_data = {
-        "email": "example@email.com",
+        "email": "example2@email.com",
         "password": "password123"
     }
 
