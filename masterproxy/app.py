@@ -5,29 +5,11 @@ from json import dumps
 
 import db
 
-class ProxyFastAPI(FastAPI):
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.proxy = None
-        self.ip = None
-        self.port = None
-
-    def set_proxy(self, proxy: str):
-        self.proxy = proxy
-
-    def set_ip(self, ip: str):
-        self.ip = ip
-
-    def set_port(self, port: int):
-        self.port = port
-
-
-app = ProxyFastAPI()
-aio_tasks: dict[int: Task] = {}
+app = FastAPI()
 
 @app.post("/registration")
 async def registration(request: Request):
+    print("in registration")
     session = db.Session()
     json_data = await request.json()
     email = json_data["email"]
