@@ -7,7 +7,7 @@ import httpx
 from asyncio import sleep
 
 
-server_url = "http://192.168.0.100"  # Замініть це на реальний URL сервера
+server_url = "http://127.0.0.1"  # Замініть це на реальний URL сервера
 
 
 async def test_compute_endpoint():

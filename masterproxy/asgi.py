@@ -14,6 +14,6 @@ argparser.add_argument(
 args = argparser.parse_args()
 
 def main():
-    HOST = "0.0.0.0"
+    HOST = "127.0.0.1"
     PORT = int(args.port)
     run(app, host=HOST, port=PORT)

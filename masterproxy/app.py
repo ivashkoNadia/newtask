@@ -66,9 +66,12 @@ async def compute(request: Request):
     if number <= 0:
         return HTTPException(401, "Це не додатнє число")
 
+    servers = session.query(db.models.Node).all()
+
 
 @app.get("/user_tasks/{user_id}")
 async def get_user_tasks(request: Request):
+    print("zero")
     session = db.Session()
     json_data = await request.json()
     email = json_data["email"]
@@ -78,13 +81,16 @@ async def get_user_tasks(request: Request):
     if not user or user.password != password:
         session.close()
         return HTTPException(401, "Invalid email or password")
+    print("first")
 
     # Пошук усіх завдань для користувача з вказаним user_id
-    tasks = session.query(Task).filter_by(user_id=user.id).all()
+    tasks = session.query(db.models.Task).filter(db.models.Task.user_id == user.id).all()
+
     session.close()
 
     if not tasks:
         return HTTPException(404, "User has no tasks")
+    print("second")
 
     # Повертання списку задач у вигляді списку словників
     task_list = []
@@ -100,5 +106,6 @@ async def get_user_tasks(request: Request):
             "output_data": task.output_data
         }
         task_list.append(task_dict)
+    print("third")
 
     return task_list
