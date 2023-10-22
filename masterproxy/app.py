@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Request, HTTPException
 from asyncio import create_task, Task
 from json import dumps
+import httpx
+
 
 
 import db
@@ -66,7 +68,41 @@ async def compute(request: Request):
     if number <= 0:
         return HTTPException(401, "Це не додатнє число")
 
-    servers = session.query(db.models.Node).all()
+    active_servers = session.query(db.models.Node).filter(db.models.Node.status == 'running').all()
+    #активні задачі для кожного сервера
+    tasks_by_server = {}
+    for server in active_servers:
+        tasks = (
+            session.query(Task)
+            .filter(Task.node_id == server.id, Task.status == 'running')
+            .all()
+        )
+        tasks_by_server[server] = tasks
+
+    #пошук найменш завантаженого серверу
+    min_load_server = None
+    min_progress = float('inf')  # початкове значення "нескінченність"
+
+    for server, tasks in tasks_by_server.items():
+        total_progress = sum(task.progress for task in tasks)
+        if total_progress < min_progress:
+            min_progress = total_progress
+            min_load_server = server
+
+    #відправка запиту createTask на цей сервер з вибраними вхідними даними
+    create_task_url = f"не знаю як тут точно має бути"
+
+    #вхідні дані
+    data = {"email": email, "password": password, "input_data": input_data}
+
+    async with httpx.AsyncClient() as client:
+        response = await client.post(create_task_url, json=data)
+
+    # Перевірка результату відповіді
+    if response.status_code == 200:
+        return "Запит на створення завдання успішно відправлено"
+    else:
+        return f"Помилка при створенні завдання: {response.status_code}"
 
 
 @app.get("/user_tasks/{user_id}")
