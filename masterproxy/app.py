@@ -90,7 +90,7 @@ async def compute(request: Request):
             min_load_server = server
 
     #відправка запиту createTask на цей сервер з вибраними вхідними даними
-    create_task_url = f"не знаю як тут точно має бути"
+    create_task_url = f"http://127.0.0.1:8080"
 
     #вхідні дані
     data = {"email": email, "password": password, "input_data": input_data}
