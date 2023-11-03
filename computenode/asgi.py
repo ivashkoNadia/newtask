@@ -6,7 +6,13 @@ from . import utils
 
 argparser = ArgumentParser()
 argparser.add_argument(
+    '--local',
+    action='store_true',
+    help="Select to run on localhost or external NIC"
+)
+argparser.add_argument(
     '--proxy',
+    required=True,
     action='store',
     help='IP address of proxy server'
 )
@@ -20,13 +26,12 @@ args = argparser.parse_args()
 
 
 def main():
-    HOST = utils.get_external_ip()
-    PORT = int(args.port)
-    app.set_ip(utils.get_external_ip())
-    app.set_port(PORT)
-    if args.proxy:
-        app.set_proxy(args.proxy)
+    if args.local:
+        HOST = "127.0.0.1"
     else:
-        print("ERROR: Proxy IP not configured")
-        return
+        HOST = utils.get_external_ip()
+    PORT = int(args.port)
+    app.set_ip(HOST)
+    app.set_port(PORT)
+    app.set_proxy(args.proxy)
     run(app, host=HOST, port=PORT)
