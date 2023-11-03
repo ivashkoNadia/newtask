@@ -1,6 +1,8 @@
 from fastapi import FastAPI, Request, HTTPException
 from asyncio import create_task, Task
 from json import dumps
+from threading import Thread
+from threading import Event
 
 import db
 from . import utils
@@ -27,7 +29,14 @@ class ProxyFastAPI(FastAPI):
 
 
 app = ProxyFastAPI()
-aio_tasks: dict[int: Task] = {}
+# aio_tasks: dict[int: Task] = {}
+aio_tasks: dict[int: tuple[Thread, Event]] = {}
+
+
+def start_task(task: db.models.Task):
+    new_task = Thread(target=core.compute, args=(task.id, Event(),))
+    new_task.start()
+    aio_tasks[task.id] = (new_task, Event())
 
 
 @app.on_event("startup")
@@ -44,9 +53,8 @@ async def startup():
     node.status = "active"
     tasks_paused = session.query(db.models.Task).filter_by(node_id=node.id, status="paused")
     for task in tasks_paused:
-        new_task = create_task(core.compute(task.id))
-        aio_tasks[task.id] = new_task
         task.status = "pending"
+        start_task(task)
     session.commit()
 
 
@@ -80,21 +88,19 @@ async def compute(request: Request):
         return HTTPException(404, "User not found")
 
     if not utils.validate_input_data(input_data):
-        return HTTPException(404, f"Invalid input_data ")
+        return HTTPException(404, f"Invalid input_data")
     task = db.models.Task(
         user_id=user_id,
         node_id=node.id,
         input_data=dumps(input_data)
     )
     session.add(task)
-    print("in compute app")
     session.commit()
-    new_task = create_task(core.compute(task.id))
-    aio_tasks[task.id] = new_task
-    return {"task_id": task.id}
+    start_task(task)
+    return {"ok": True, "result": {"task_id": task.id}}
 
 
-@app.post("/cancel_task", status_code=200)
+@app.post("/cancelTask", status_code=200)
 async def cancel_task(request: Request):
     json_data = await request.json()
     task_id = json_data["task_id"]
@@ -105,8 +111,8 @@ async def cancel_task(request: Request):
     if not task:
         return HTTPException(404, "Task to cancel not found")
     if task_id in aio_tasks.keys():
-        aio_tasks[task_id].cancel()
+        aio_tasks[task_id][1].set()
     task.status = "canceled"
     task.progress = 0
     session.commit()
-    return {"OK": True}
+    return {"ok": True}
