@@ -33,17 +33,17 @@ aio_tasks: dict[int: Task] = {}
 @app.on_event("startup")
 async def startup():
     session = db.Session()
-    node = session.query(db.models.Node).filter_by(ip=app.ip, status="stopped").first()
+    node = session.query(db.models.Node).filter_by(ip=app.ip, port=app.port, status="inactive").first()
     if not node:
         node = db.models.Node(
             ip=app.ip,
             port=app.port,
-            status="running"
+            status="active"
         )
         session.add(node)
-    node.status = "running"
-    tasks = session.query(db.models.Task).filter_by(node_id=node.id)
-    for task in tasks:
+    node.status = "active"
+    tasks_paused = session.query(db.models.Task).filter_by(node_id=node.id, status="paused")
+    for task in tasks_paused:
         new_task = create_task(core.compute(task.id))
         aio_tasks[task.id] = new_task
         task.status = "pending"
@@ -53,9 +53,9 @@ async def startup():
 @app.on_event("shutdown")
 def shutdown():
     session = db.Session()
-    node = session.query(db.models.Node).filter_by(ip=app.ip, status="stopped").first()
+    node = session.query(db.models.Node).filter_by(ip=app.ip, port=app.port, status="active").first()
     node.status = "inactive"
-    tasks = session.query(db.models.Task).filter_by(node_id=node.id)
+    tasks = session.query(db.models.Task).filter_by(node_id=node.id, status="pending")
     for task in tasks:
         task.status = "paused"
     session.commit()

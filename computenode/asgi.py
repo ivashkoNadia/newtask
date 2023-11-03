@@ -20,7 +20,7 @@ args = argparser.parse_args()
 
 
 def main():
-    HOST = "127.0.0.1"
+    HOST = utils.get_external_ip()
     PORT = int(args.port)
     app.set_ip(utils.get_external_ip())
     app.set_port(PORT)
