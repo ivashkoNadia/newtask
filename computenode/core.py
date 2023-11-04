@@ -33,12 +33,9 @@ def SLAEbyIterations(input_data: int, stop_event: Event, task: db.models.Task, s
     if input_data <= 2:
         exceptions.Error("not valid size")
     matrix, right_column = fillRandomSLAR(input_data)
-
     N = len(matrix)
     result = [0] * N
     start_time = time.time()
-    # a1 = N-1
-    # d = 1
     total_iter_num = int((N-1)*N)
     progress = 0
     for i in range(N):
