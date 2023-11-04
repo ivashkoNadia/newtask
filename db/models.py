@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import relationship
 from sqlalchemy.ext.declarative import declarative_base
 from json import loads
+from . import schemas
 
 Base = declarative_base()
 class Node(Base):
@@ -12,12 +12,17 @@ class Node(Base):
     port = Column(Integer)
     status = Column(String)
 
+
 class User(Base):
     __tablename__ = "users"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
     email = Column(String)
     password = Column(String)
+
+    def to_schema(self) -> schemas.User:
+        return schemas.User(email=self.email)
+
 
 class Task(Base):
     __tablename__ = "tasks"
@@ -36,6 +41,16 @@ class Task(Base):
 
     def get_output_data(self):
         return loads(self.output_data)
+
+    def to_schema(self):
+        return schemas.Task(
+            id=self.id,
+            status=self.status,
+            error=self.error,
+            progress=self.progress,
+            input_data=self.input_data,
+            output_data=self.output_data
+        )
     #
     # @property
     # def input_data(self):

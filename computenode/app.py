@@ -34,15 +34,16 @@ aio_tasks: dict[int: tuple[Thread, Event]] = {}
 
 
 def start_task(task: db.models.Task):
-    new_task = Thread(target=core.compute, args=(task.id, Event(),))
+    stop_event = Event()
+    new_task = Thread(target=core.compute, args=(task.id, stop_event,))
     new_task.start()
-    aio_tasks[task.id] = (new_task, Event())
+    aio_tasks[task.id] = (new_task, stop_event)
 
 
 @app.on_event("startup")
 async def startup():
     session = db.Session()
-    node = session.query(db.models.Node).filter_by(ip=app.ip, port=app.port, status="inactive").first()
+    node = session.query(db.models.Node).filter_by(ip=app.ip, port=app.port).first()
     if not node:
         node = db.models.Node(
             ip=app.ip,
@@ -82,7 +83,7 @@ async def compute(request: Request):
     input_data = json_data["input_data"]
     if request.client.host not in (app.proxy, "127.0.0.1"):
         return HTTPException(403, "Access denied")
-    node = session.query(db.models.Node).filter_by(ip=app.ip).first()
+    node = session.query(db.models.Node).filter_by(ip=app.ip, port=app.port).first()
     user = session.query(db.models.User).filter_by(id=user_id).first()
     if not user:
         return HTTPException(404, "User not found")
@@ -112,7 +113,4 @@ async def cancel_task(request: Request):
         return HTTPException(404, "Task to cancel not found")
     if task_id in aio_tasks.keys():
         aio_tasks[task_id][1].set()
-    task.status = "canceled"
-    task.progress = 0
-    session.commit()
     return {"ok": True}
