@@ -1,5 +1,6 @@
 from fastapi import FastAPI, Request, HTTPException
 from asyncio import create_task, Task
+from colorama import init as colorama_init
 from json import dumps
 from threading import Thread
 from threading import Event
@@ -7,7 +8,6 @@ from threading import Event
 import db
 from . import utils
 from . import core
-#python runnode.py --proxy 192.168.0.100
 
 
 class ProxyFastAPI(FastAPI):
@@ -28,6 +28,7 @@ class ProxyFastAPI(FastAPI):
         self.port = port
 
 
+colorama_init(autoreset=True)
 app = ProxyFastAPI()
 # aio_tasks: dict[int: Task] = {}
 aio_tasks: dict[int: tuple[Thread, Event]] = {}

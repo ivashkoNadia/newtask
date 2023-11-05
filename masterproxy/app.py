@@ -1,10 +1,21 @@
-from fastapi import FastAPI, Request, HTTPException
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import httpx
+from colorama import init as colorama_init
 from db import schemas
 
 import db
 
+colorama_init(autoreset=True)
+
 app = FastAPI()
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 @app.post("/register", response_model=schemas.ResponseOK | schemas.ResponseError)
@@ -30,7 +41,7 @@ async def signin(user_info: schemas.User):
     user = session.query(db.models.User).filter_by(email=user_info.email).first()
     if not user or user.password != user_info.password:
         session.close()
-        return schemas.ResponseError(erro_code=401, description="Invalid email or password")
+        return schemas.ResponseError(error_code=401, description="Invalid email or password")
     session.close()
     return schemas.ResponseOK(result={"authenticated": True})
 
