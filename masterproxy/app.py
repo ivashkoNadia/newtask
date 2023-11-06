@@ -77,7 +77,7 @@ async def compute(create_task_info: schemas.CreateTask):
     return schemas.ResponseOK(result={"task": task_info})
 
 
-@app.get("/getTasks", response_model=schemas.ResponseOK | schemas.ResponseError)
+@app.post("/getTasks", response_model=schemas.ResponseOK | schemas.ResponseError)
 async def get_tasks(user_info: schemas.User):
     session = db.Session()
     #щоб не можна було витягнути інформацію про чужі tasks
