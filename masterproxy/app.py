@@ -17,6 +17,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+MAX_MATRIX_SIZE = 10000
+MAX_ACTIVE_TASKS = 5
+
 
 @app.post("/register", response_model=schemas.ResponseOK | schemas.ResponseError)
 async def registration(user_info: schemas.User):
@@ -57,6 +60,11 @@ async def compute(create_task_info: schemas.CreateTask):
     if not active_servers:
         session.close()
         return schemas.ResponseError(error_code=500, description="Compute servers are not deployed")
+    pending_tasks_num = session.query(db.models.Task).filter_by(user_id=user.id, status="pending").count()
+    if pending_tasks_num > MAX_ACTIVE_TASKS:
+        return schemas.ResponseError(error_code=403, description="Pending tasks number exceed limit (5 per user)")
+    if int(create_task_info.input_data) > MAX_MATRIX_SIZE:
+        return schemas.ResponseError(error_code=403, description="Given size is too large (max 10000)")
 
     # BALANCING
     server_stats = {server.id: 0 for server in session.query(db.models.Node).filter_by(status="active").all()}
@@ -119,6 +127,4 @@ async def cancel_task(cancel_task_info: schemas.CancelTask):
     task_info = task.to_schema().dict()
     session.close()
     return schemas.ResponseOK(result={"task": task_info})
-
-
 
