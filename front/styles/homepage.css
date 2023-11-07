@@ -1,0 +1,82 @@
+* {
+    margin: 0;
+    padding: 0;
+}
+
+.homepage_container {
+    background-color: white;
+    border-radius: 15px;
+    margin: 20px 10px 20px 10px;
+    padding: 5px 0 5px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.homepage_container > label {
+    margin-right: 10%;
+}
+
+.homepage_container input {
+    border-bottom: 2px solid gray;
+    outline: 0;
+    font-size: 1.3rem;
+    background: transparent;
+    transition: border-color 0.2s;
+    width: 150px;
+    border-radius: 5px;
+    margin-right: 15%;
+}
+
+.homepage_container button {
+    background-color: rgb(106, 98, 210);
+    border-radius: 5px;
+    padding: 5px;
+    border: none;
+    cursor: pointer;
+    color: snow;
+    margin-right: 5%;
+}
+
+body {
+    padding: 0 70px;
+}
+
+#tasks_container_header {
+    display: grid;
+    grid-template-columns: 2fr 2fr 3fr 3fr 1fr;
+    margin-bottom: 5px;
+}
+
+#tasks_container_header > h3{
+    display: block;
+    margin: 0 auto;
+}
+
+#tasks_container_content {
+    display: grid;
+    row-gap: 10px;
+    margin-bottom: 100px;
+}
+
+#tasks_container_content > form {
+    display: grid;
+    grid-template-columns: 2fr 2fr 3fr 3fr 1fr;
+    justify-content: center;
+    align-items: center;
+    padding-bottom: 10px;
+}
+
+#tasks_container_content > form > * {
+    display: block;
+    text-align: center;
+}
+
+.show-hide-button, .cancelbtn{
+    background-color: #6A62D2;
+    border-radius: 5px;
+    padding: 4px;
+    border: none;
+    cursor: pointer;
+    color: snow;
+}

@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles/loginpage.css">
+    <link rel="stylesheet" href="styles/homepage.css">
+    <title>Distributed computing</title>
+</head>
+
+<body>
+    <div id="loginpage_div">
+
+        <h3>Distributed computing</h3>
+        <div id="introduction">
+            <button class="loginbtn" onclick="document.getElementById('id01').style.display='block'" style="width:auto;">Login</button>
+            <button class="loginbtn" onclick="document.getElementById('id02').style.display='block'" style="width:auto;">Register</button>
+            <h4>Created by Nadiia Ivashko</h4>
+        </div>
+        <!-- action="/action_page.php" -->
+        <div id="id01" class="modal">
+            <form id="loginForm" class="modal-content animate" method="post" onsubmit="return getUserData('loginForm')">
+    
+    
+                <div class="container">
+                    <label for="login_username"><b>Username</b></label>
+                    <input id="login_username" type="text" placeholder="Enter Username" required>
+    
+                    <label for="login_password"><b>Password</b></label>
+                    <input id="login_password" type="text" placeholder="Enter Password" required>
+                     <h3 id="container__login-info"></h3>
+                    <button class="loginbtn" type="submit">Login</button>
+                </div>
+    
+                <div class="container" style="background-color:#f1f1f1">
+                    <button type="button" onclick="document.getElementById('id01').style.display='none'"
+                        class="cancelbtn">Cancel</button>
+                </div>
+    
+            </form>
+        </div>
+        <div id="id02" class="modal">
+            <form id="registerForm" class="modal-content animate" method="post" onsubmit="return getUserData('registerForm')">
+    
+    
+                <div class="container">
+                    <label for="register_username"><b>Username</b></label>
+                    <input id="register_username" type="text" placeholder="Enter Username" required>
+    
+                    <label for="register_password"><b>Password</b></label>
+                    <input id="register_password" type="text" placeholder="Enter Password" required>
+                     <h3 id="container__register-info"></h3>
+                    <button class="loginbtn" type="submit">Register</button>
+                </div>
+    
+                <div class="container" style="background-color:#f1f1f1">
+                    <button type="button" onclick="document.getElementById('id02').style.display='none'"
+                        class="cancelbtn">Cancel</button>
+                </div>
+    
+            </form>
+        </div>
+    </div>
+
+    <script src="main.js"></script>
+</body>
+
+</html>
